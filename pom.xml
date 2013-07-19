@@ -12,13 +12,13 @@
 	<description>Scala CLI interface for Redmine</description>
 
 	<properties>
-		<scala.version>2.10.1</scala.version>
-		<scala.version.short>2.10</scala.version.short>
-		<spray.io.version>1.2-M8</spray.io.version>
 		<junit.version>4.11</junit.version>
-		<typesafe.config.alias>1.0.2</typesafe.config.alias>
-		<scalop.version>0.9.3</scalop.version>
 		<maven.plugin.scala>2.15.2</maven.plugin.scala>
+		<scala.version.short>2.10</scala.version.short>
+		<scala.version>2.10.1</scala.version>
+		<scalop.version>0.9.3</scalop.version>
+		<spray.io.version>1.2-M8</spray.io.version>
+		<typesafe.config.alias>1.0.2</typesafe.config.alias>
 	</properties>
 
 	<dependencies>
