@@ -18,6 +18,7 @@
 		<junit.version>4.11</junit.version>
 		<typesafe.config.alias>1.0.2</typesafe.config.alias>
 		<scalop.version>0.9.3</scalop.version>
+		<maven.plugin.scala>2.15.2</maven.plugin.scala>
 	</properties>
 
 	<dependencies>
@@ -65,6 +66,7 @@
 			<plugin>
 				<groupId>org.scala-tools</groupId>
 				<artifactId>maven-scala-plugin</artifactId>
+				<version>${maven.plugin.scala}</version>
 				<executions>
 					<execution>
 						<goals>
