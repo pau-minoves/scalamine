@@ -8,7 +8,6 @@ import com.typesafe.config.ConfigFactory
 import com.typesafe.config.ConfigException
 import com.typesafe.config.Config
 import org.rogach.scallop._
-import org.redmine.ta.RedmineManager
 import java.io.File
 
 class CLIConf(arguments: Seq[String]) extends ScallopConf(arguments) {
