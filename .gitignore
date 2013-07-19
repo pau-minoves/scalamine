@@ -3,7 +3,9 @@
 
 # eclipse
 .project
-.class
+.cache
+.settings
+.classpath
 
 # maven
 target
