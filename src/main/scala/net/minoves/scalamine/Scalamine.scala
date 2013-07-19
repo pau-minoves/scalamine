@@ -9,6 +9,8 @@ import com.typesafe.config.ConfigException
 import com.typesafe.config.Config
 import org.rogach.scallop._
 import java.io.File
+import akka.actor.ActorSystem
+import scala.concurrent.Future
 
 class CLIConf(arguments: Seq[String]) extends ScallopConf(arguments) {
 
@@ -102,7 +104,7 @@ object Scalamine {
 
       cliconf.view.commandName match { // TODO Wrond, commandName is fixed
         case "view" =>
-          cmdViewProject()
+          cmdViewProject(conf)
         case _ =>
           throw new Exception("what?")
       }
@@ -126,13 +128,27 @@ object Scalamine {
       case ex: ConfigException => {
         println(ex.getMessage)
       }
-      case e: Exception => {
-        println("Oops: " + e)
-      }
+      case e: Exception =>
+        {
+          println("Oops: " + e)
+        }
     }
 
-    def cmdViewProject() {
-      println("view!")
+    def cmdViewProject(conf: Config) {
+
+      import spray.http._
+      import spray.client.pipelining._
+
+      implicit val system = ActorSystem()
+      import system.dispatcher // execution context for futures
+
+      val pipeline: HttpRequest => Future[HttpResponse] = sendReceive
+
+      //      val response: Future[HttpResponse] = pipeline(Get(conf getString ("servers.test1.host")))
+      val response: Future[HttpResponse] = pipeline(Get(conf getString ("www.google.com")))
+
+      println(response)
     }
+
   }
 }
