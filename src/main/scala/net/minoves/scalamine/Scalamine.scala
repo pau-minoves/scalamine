@@ -9,8 +9,8 @@ import com.typesafe.config.ConfigException
 import com.typesafe.config.Config
 import org.rogach.scallop._
 import java.io.File
-import akka.actor.ActorSystem
 import scala.concurrent.Future
+import grizzled.slf4j.Logging
 
 class CLIConf(arguments: Seq[String]) extends ScallopConf(arguments) {
 
@@ -56,7 +56,7 @@ class CLIConf(arguments: Seq[String]) extends ScallopConf(arguments) {
   footer("\nEnjoy!");
 }
 
-object Scalamine {
+object Scalamine extends Logging {
 
   def main(args: Array[String]): Unit = {
 
@@ -81,9 +81,9 @@ object Scalamine {
       if (cliconf.help())
         cliconf.printHelp
 
-      if (cliconf.verbose() > 0) {
-        println("CLI parameters:")
-        println(cliconf.summary) // Options marked with * are supplied, instead of default value.
+      if (cliconf.verbose() > 0) { // TODO bump trace level of application root logger by one (check logula)
+        debug("CLI parameters:")
+        debug(cliconf.summary) // Options marked with * are supplied, instead of default value.
       }
 
       var homeconf = new File(sys.props("user.home") + "/.scalaminerc")
@@ -126,28 +126,23 @@ object Scalamine {
 
     } catch {
       case ex: ConfigException => {
-        println(ex.getMessage)
+        error(ex.getMessage)
       }
-      case e: Exception =>
-        {
-          println("Oops: " + e)
-        }
+      case e: Exception => {
+        error("Oops: " + e)
+      }
     }
 
     def cmdViewProject(conf: Config) {
+      val api = RedmineAPI(conf, RedmineInstance(
+        conf getString ("servers.test.host"),
+        conf getString ("servers.test.path"),
+        conf getInt ("servers.test.port"),
+        conf getString ("servers.test.apiKey")))
 
-      import spray.http._
-      import spray.client.pipelining._
+      info(api project ("project1"))
 
-      implicit val system = ActorSystem()
-      import system.dispatcher // execution context for futures
-
-      val pipeline: HttpRequest => Future[HttpResponse] = sendReceive
-
-      //      val response: Future[HttpResponse] = pipeline(Get(conf getString ("servers.test1.host")))
-      val response: Future[HttpResponse] = pipeline(Get(conf getString ("www.google.com")))
-
-      println(response)
+      api shutdown
     }
 
   }

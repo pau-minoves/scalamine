@@ -12,13 +12,17 @@
 	<description>Scala CLI interface for Redmine</description>
 
 	<properties>
+		<akka.version>2.2.0-RC1</akka.version>
 		<junit.version>4.11</junit.version>
 		<maven.plugin.scala>2.15.2</maven.plugin.scala>
 		<scala.version.short>2.10</scala.version.short>
-		<scala.version>2.10.1</scala.version>
+		<scala.version>2.10.0</scala.version>
 		<scalop.version>0.9.3</scalop.version>
-		<spray.io.version>1.2-M8</spray.io.version>
+		<spray.json>1.2.5</spray.json>
+		<httpclient.version>4.2.5</httpclient.version>
 		<typesafe.config.alias>1.0.2</typesafe.config.alias>
+		<grizzled-slf4j.version>1.0.1</grizzled-slf4j.version>
+		<logback.version>0.9.13</logback.version>
 	</properties>
 
 	<dependencies>
@@ -43,19 +47,27 @@
 
 		<dependency>
 			<groupId>io.spray</groupId>
-			<artifactId>spray-client</artifactId>
-			<version>${spray.io.version}</version>
+			<artifactId>spray-json_${scala.version.short}</artifactId>
+			<version>${spray.json}</version>
 		</dependency>
 
-		<!-- Must be provided by us -->
 		<dependency>
-			<groupId>com.typesafe.akka</groupId>
-			<artifactId>akka-actor_2.10</artifactId>
-			<version>2.2.0</version>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>${httpclient.version}</version>
 		</dependency>
 
-		<!-- <dependency> <groupId>com.github.stephenc.connectors</groupId> <artifactId>redmine-java-api</artifactId> 
-			<version>1.15.1-SNAPSHOT</version> </dependency> -->
+		<dependency>
+			<groupId>org.clapper</groupId>
+			<artifactId>grizzled-slf4j_2.10</artifactId>
+			<version>${grizzled-slf4j.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>${logback.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>junit</groupId>
@@ -80,7 +92,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<sourceDir>src/main/java</sourceDir>
+					<sourceDir>src/main/scala</sourceDir>
 					<jvmArgs>
 						<jvmArg>-Xms64m</jvmArg>
 						<jvmArg>-Xmx1024m</jvmArg>
@@ -96,6 +108,7 @@
 			<name>Scala-tools Maven2 Repository</name>
 			<url>http://scala-tools.org/repo-releases</url>
 		</repository>
+
 		<repository>
 			<id>spray-repo</id>
 			<url>http://repo.spray.io/</url>
@@ -106,6 +119,7 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
+
 	</repositories>
 
 	<pluginRepositories>
