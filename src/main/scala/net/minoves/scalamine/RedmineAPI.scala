@@ -18,53 +18,91 @@ case class RedmineInstance(
   port: Int,
   apiKey: String)
 
+case class ProjectReference(
+  id: Int,
+  name: String)
+
 case class Project(
   id: Int,
   name: String,
   identifier: String,
   description: String,
   homepage: String,
-  createdOn: String,
-  updatedOn: String)
-case class Issue(id: Int, subject: String)
+  created_on: String,
+  updated_on: String)
+
+case class Issue(
+  id: Int,
+  project: ProjectReference,
+  subject: String,
+  description: String,
+  start_date: String,
+  done_ratio: Int,
+  spent_hours: Double,
+  created_on: String,
+  updated_on: String)
 
 object RedmineProtocol extends DefaultJsonProtocol {
-  /* {"project":{
+  /* {"issue":
+   * {
    * "id":1,
-   * "name":"project1",
-   * "identifier":"project1",
-   * "description":"Description for project 1 (non-public)",
-   * "homepage":"",
-   * "created_on":"2013-07-04T22:12:57Z",
-   * "updated_on":"2013-07-04T22:12:57Z"}}
+   * "project":{"id":1,"name":"project1"},
+   * "tracker":{"id":2,"name":"Feature"},
+   * "status":{"id":1,"name":"New"},
+   * "priority":{"id":2,"name":"Normal"},
+   * "author":{"id":1,"name":"Pau Minoves"},
+   * "assigned_to":{"id":1,"name":"Pau Minoves"},
+   * "subject":"Feature 1",
+   * "description":"Feature 1 for testing",
+   * "start_date":"2013-07-04",
+   * "done_ratio":0,
+   * "spent_hours":0.0,
+   * "created_on":"2013-07-04T22:13:38Z",
+   * "updated_on":"2013-07-04T22:13:38Z"
+   * }
+   * }
   */
+  implicit val projectReference = jsonFormat2(ProjectReference)
   implicit val projectFormat = jsonFormat7(Project)
-  implicit val issueFormat = jsonFormat2(Issue)
+  implicit val issueFormat = jsonFormat9(Issue)
 }
 
 import RedmineProtocol._
 
 case class RedmineAPI(conf: Config, instance: RedmineInstance) extends Logging {
 
+  implicit def resolveProject(pr: ProjectReference): Project = {
+    project(pr.id)
+  }
+
   trace("init start")
 
   val client = new DefaultHttpClient
 
-  val brh = new BasicResponseHandler // needed so responses are parsed as String
+  val brh = new BasicResponseHandler // needed so responses are parsed as String (implicitly of type [String])
 
   trace("init end")
 
-  def project(identifier: String): Project = {
+  def get(partialPath: String): HttpGet = {
+    new HttpGet(instance.host + partialPath + ".json?key=" + instance.apiKey)
+  }
 
-    val get = new HttpGet(instance.host + "/projects/" + identifier + ".json?key=" + instance.apiKey)
+  def project(id: Int): Project = project(id.toString)
 
-    val project = client.execute(get, brh)
+  def project(id: String): Project = {
+    client.execute(get("/projects/" + id), brh)
+      .asJson
+      .asJsObject
+      .fields("project")
+      .convertTo[Project]
+  }
 
-    debug(project)
-    debug(project.asJson.x)
-    debug(project.asJson.asJsObject("project"))
-
-    return project.asJson.convertTo[Project]
+  def issue(id: String): Issue = {
+    client.execute(get("/issues/" + id), brh)
+      .asJson
+      .asJsObject
+      .fields("issue")
+      .convertTo[Issue]
   }
 
   def shutdown(): Unit = {

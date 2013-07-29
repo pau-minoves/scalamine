@@ -140,7 +140,20 @@ object Scalamine extends Logging {
         conf getInt ("servers.test.port"),
         conf getString ("servers.test.apiKey")))
 
-      info(api project ("project1"))
+      val project1 = api project ("project1")
+      info(project1)
+
+      info(project1 id)
+
+      info(api issue "1")
+
+      val project = api.issue("1").project
+      info(project.name)
+
+      import RedmineAPI._
+
+      // TODO import implicit!
+      info(project.asInstanceOf[Project].created_on)
 
       api shutdown
     }
